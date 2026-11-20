@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f3f3f3">
+  <title>Windows Calculator — Improved Version</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --window: #f3f3f3;
+      --surface: #fafafa;
+      --surface-hover: #e5e5e5;
+      --surface-active: #d6d6d6;
+      --text: #171717;
+      --muted: #666;
+      --accent: #0067c0;
+      --operator: #f0f0f0;
+      --border: #dedede;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      padding: 24px; background: #e8edf3; color: var(--text);
+    }
+    button { font: inherit; color: inherit; border: 0; cursor: pointer; }
+    button:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+    .app {
+      width: min(100%, 920px); min-height: 610px; height: min(720px, calc(100vh - 48px));
+      display: grid; grid-template-columns: minmax(320px, 1fr) 250px;
+      background: var(--window); box-shadow: 0 18px 55px #26364a30;
+      border: 1px solid #d6dce3; overflow: hidden;
+    }
+    .calculator { min-width: 0; display: flex; flex-direction: column; padding: 0 12px 12px; }
+    .titlebar { height: 42px; display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+    .window-actions { display:flex; height:100%; }
+    .window-actions span { width:44px; display:grid; place-items:center; }
+    .window-actions span:last-child:hover { background:#c42b1c; color:white; }
+    .toolbar { height:48px; display:flex; align-items:center; gap:16px; }
+    .icon-button { width:36px; height:36px; border-radius:4px; background:transparent; font-size:20px; }
+    .icon-button:hover { background:var(--surface-hover); }
+    .mode { font-size:20px; font-weight:600; }
+    .display { min-height:130px; display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-end; padding:12px 8px 16px; overflow:hidden; }
+    .expression { min-height:25px; color:var(--muted); font-size:15px; overflow-wrap:anywhere; }
+    .result { width:100%; text-align:right; font-size:clamp(38px, 7vw, 54px); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .memory { display:grid; grid-template-columns:repeat(6,1fr); gap:3px; margin-bottom:6px; }
+    .memory button { height:34px; background:transparent; border-radius:4px; font-size:12px; font-weight:600; }
+    .memory button:hover:not(:disabled) { background:var(--surface-hover); }
+    button:disabled { color:#aaa; cursor:default; }
+    .keys { flex:1; min-height:300px; display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(6,1fr); gap:4px; }
+    .key { background:var(--surface); border:1px solid var(--border); border-radius:4px; font-size:19px; transition:background .12s; }
+    .key:hover { background:var(--surface-hover); }
+    .key:active { background:var(--surface-active); }
+    .key.function { background:var(--operator); }
+    .key.equals { background:var(--accent); color:white; border-color:var(--accent); }
+    .key.equals:hover { background:#005ba8; }
+    .side { border-left:1px solid var(--border); padding:18px 14px; display:flex; flex-direction:column; min-width:0; }
+    .tabs { display:flex; gap:20px; border-bottom:1px solid var(--border); }
+    .tab { background:transparent; padding:0 2px 10px; color:var(--muted); font-weight:600; }
+    .tab.active { color:var(--text); border-bottom:3px solid var(--accent); }
+    .history-list { overflow:auto; flex:1; padding-top:10px; }
+    .history-item { padding:10px 8px; border-radius:4px; text-align:right; cursor:pointer; }
+    .history-item:hover { background:var(--surface-hover); }
+    .history-item .old { color:var(--muted); font-size:13px; margin-bottom:4px; }
+    .history-item .new { font-size:20px; font-weight:600; }
+    .empty { color:var(--muted); font-size:13px; line-height:1.6; margin-top:18px; }
+    .side-footer { display:flex; justify-content:flex-end; padding-top:10px; }
+    .clear { background:transparent; border-radius:4px; padding:8px 12px; }
+    .clear:hover { background:var(--surface-hover); }
+    @media (max-width:650px) {
+      body { padding:0; background:var(--window); }
+      .app { width:100%; height:100vh; min-height:560px; grid-template-columns:1fr; border:0; }
+      .side { display:none; }
+      .calculator { padding:0 8px 8px; }
+      .display { min-height:145px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="Calculator application">
+    <section class="calculator">
+      <header class="titlebar">
+        <span>▦ &nbsp; Calculator</span>
+        <div class="window-actions" aria-hidden="true"><span>—</span><span>□</span><span>×</span></div>
+      </header>
+      <div class="toolbar">
+        <button class="icon-button" aria-label="Menu">☰</button>
+        <div class="mode">Standard</div>
+      </div>
+      <section class="display" aria-live="polite">
+        <div class="expression" id="expression"></div>
+        <div class="result" id="display">0</div>
+      </section>
+      <div class="memory">
+        <button data-memory="clear" disabled>MC</button>
+        <button data-memory="recall" disabled>MR</button>
+        <button data-memory="add" disabled>M+</button>
+        <button data-memory="subtract" disabled>M−</button>
+        <button data-memory="store">MS</button>
+        <button data-memory="list" disabled>M▾</button>
+      </div>
+      <section class="keys" aria-label="Calculator keys">
+        <button class="key function" data-action="percent">%</button>
+        <button class="key function" data-action="clear-entry">CE</button>
+        <button class="key function" data-action="clear">C</button>
+        <button class="key function" data-action="backspace">⌫</button>
+        <button class="key function" data-action="reciprocal">¹⁄ₓ</button>
+        <button class="key function" data-action="square">x²</button>
+        <button class="key function" data-action="sqrt">√x</button>
+        <button class="key function" data-operator="÷">÷</button>
+        <button class="key" data-digit="7">7</button>
+        <button class="key" data-digit="8">8</button>
+        <button class="key" data-digit="9">9</button>
+        <button class="key function" data-operator="×">×</button>
+        <button class="key" data-digit="4">4</button>
+        <button class="key" data-digit="5">5</button>
+        <button class="key" data-digit="6">6</button>
+        <button class="key function" data-operator="−">−</button>
+        <button class="key" data-digit="1">1</button>
+        <button class="key" data-digit="2">2</button>
+        <button class="key" data-digit="3">3</button>
+        <button class="key function" data-operator="+">+</button>
+        <button class="key function" data-action="sign">+/−</button>
+        <button class="key" data-digit="0">0</button>
+        <button class="key" data-action="decimal">.</button>
+        <button class="key equals" data-action="equals">=</button>
+      </section>
+    </section>
+    <aside class="side">
+      <nav class="tabs"><button class="tab active">History</button><button class="tab">Memory</button></nav>
+      <div class="history-list" id="history"><p class="empty">There's no history yet</p></div>
+      <div class="side-footer"><button class="clear" id="clear-history" aria-label="Clear history">⌫</button></div>
+    </aside>
+  </main>
+  <script>
+    (() => {
+      const display = document.getElementById('display');
+      const expression = document.getElementById('expression');
+      const historyList = document.getElementById('history');
+      const memoryButtons = [...document.querySelectorAll('[data-memory]')];
+      let current = '0';
+      let stored = null;
+      let operator = null;
+      let waitingForOperand = false;
+      let memory = null;
+      let history = [];
+
+      const number = () => Number(current);
+      const format = value => {
+        if (!Number.isFinite(value)) return 'Cannot divide by zero';
+        return String(Number.parseFloat(value.toPrecision(12)));
+      };
+      const render = () => {
+        display.textContent = current;
+        memoryButtons.forEach(button => {
+          button.disabled = memory === null && button.dataset.memory !== 'store';
+        });
+      };
+      const inputDigit = digit => {
+        if (current === 'Cannot divide by zero' || waitingForOperand) {
+          current = digit; waitingForOperand = false;
+        } else if (current.replace('-', '').replace('.', '').length < 15) {
+          current = current === '0' ? digit : current + digit;
+        }
+        render();
+      };
+      const inputDecimal = () => {
+        if (waitingForOperand || current === 'Cannot divide by zero') {
+          current = '0.'; waitingForOperand = false;
+        } else if (!current.includes('.')) current += '.';
+        render();
+      };
+      const calculate = (a, b, op) => {
+        if (op === '+') return a + b;
+        if (op === '−') return a - b;
+        if (op === '×') return a * b;
+        if (op === '÷') return b === 0 ? NaN : a / b;
+        return b;
+      };
+      const chooseOperator = nextOperator => {
+        const input = number();
+        if (operator && !waitingForOperand) {
+          const result = calculate(stored, input, operator);
+          current = format(result);
+          stored = Number(current);
+        } else stored = input;
+        operator = nextOperator;
+        waitingForOperand = true;
+        expression.textContent = format(stored) + ' ' + operator;
+        render();
+      };
+      const equals = () => {
+        if (!operator || stored === null) return;
+        const left = stored, right = number(), op = operator;
+        const result = calculate(left, right, op);
+        expression.textContent = format(left) + ' ' + op + ' ' + format(right) + ' =';
+        current = format(result);
+        history.unshift({ formula: expression.textContent, result: current });
+        renderHistory();
+        stored = null; operator = null; waitingForOperand = true; render();
+      };
+      const unary = action => {
+        const value = number();
+        let result = value;
+        if (action === 'sign') result = -value;
+        if (action === 'percent') result = operator && stored !== null ? stored * value / 100 : value / 100;
+        if (action === 'sqrt') result = value < 0 ? NaN : Math.sqrt(value);
+        if (action === 'square') result = value * value;
+        if (action === 'reciprocal') result = value === 0 ? NaN : 1 / value;
+        expression.textContent = ({
+          sign: 'Negate(' + current + ')', percent: current + '%',
+          sqrt: '√(' + current + ')', square: 'sqr(' + current + ')',
+          reciprocal: '1 / ' + current
+        })[action];
+        current = format(result);
+        waitingForOperand = true;
+        render();
+      };
+      const clear = () => {
+        current = '0'; stored = null; operator = null; waitingForOperand = false;
+        expression.textContent = ''; render();
+      };
+      const backspace = () => {
+        if (waitingForOperand || current === 'Cannot divide by zero') return;
+        current = current.length > 1 ? current.slice(0, -1) : '0';
+        if (current === '-') current = '0';
+        render();
+      };
+      const renderHistory = () => {
+        historyList.innerHTML = '';
+        if (!history.length) {
+          historyList.innerHTML = '<p class="empty">There\'s no history yet</p>';
+          return;
+        }
+        history.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'history-item';
+          const old = document.createElement('div');
+          old.className = 'old'; old.textContent = item.formula;
+          const result = document.createElement('div');
+          result.className = 'new'; result.textContent = item.result;
+          row.append(old, result);
+          row.addEventListener('click', () => {
+            current = item.result; waitingForOperand = true; render();
+          });
+          historyList.append(row);
+        });
+      };
+      const memoryAction = action => {
+        if (action === 'store') memory = number();
+        if (action === 'clear') memory = null;
+        if (action === 'recall' && memory !== null) { current = format(memory); waitingForOperand = true; }
+        if (action === 'add' && memory !== null) memory += number();
+        if (action === 'subtract' && memory !== null) memory -= number();
+        render();
+      };
+      document.querySelector('.keys').addEventListener('click', event => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        if (button.dataset.digit !== undefined) inputDigit(button.dataset.digit);
+        else if (button.dataset.operator) chooseOperator(button.dataset.operator);
+        else if (button.dataset.action === 'equals') equals();
+        else if (button.dataset.action === 'decimal') inputDecimal();
+        else if (button.dataset.action === 'clear') clear();
+        else if (button.dataset.action === 'clear-entry') { current = '0'; render(); }
+        else if (button.dataset.action === 'backspace') backspace();
+        else unary(button.dataset.action);
+      });
+      document.querySelector('.memory').addEventListener('click', event => {
+        const button = event.target.closest('button');
+        if (button) memoryAction(button.dataset.memory);
+      });
+      document.getElementById('clear-history').addEventListener('click', () => {
+        history = []; renderHistory();
+      });
+      document.addEventListener('keydown', event => {
+        if (/^[0-9]$/.test(event.key)) inputDigit(event.key);
+        else if (event.key === '.') inputDecimal();
+        else if (event.key === 'Enter' || event.key === '=') { event.preventDefault(); equals(); }
+        else if (event.key === 'Escape') clear();
+        else if (event.key === 'Backspace') backspace();
+        else if (event.key === '+') chooseOperator('+');
+        else if (event.key === '-') chooseOperator('−');
+        else if (event.key === '*') chooseOperator('×');
+        else if (event.key === '/') { event.preventDefault(); chooseOperator('÷'); }
+        else if (event.key === '%') unary('percent');
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>
