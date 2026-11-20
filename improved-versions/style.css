@@ -1,0 +1,362 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --color-window: #e6e6e6;
+  --color-key: #fafafa;
+  --color-function: #f0f0f0;
+  --color-hover: #d1d1d1;
+  --color-text: #171717;
+  --color-muted: #777;
+  --color-accent: #2585f3;
+  --color-close: #e81123;
+
+  --title-bar-height: 32px;
+  --key-gap: 2px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-text);
+  background: #dfe3e8;
+}
+
+button {
+  font: inherit;
+}
+
+.calculator-window {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-rows: var(--title-bar-height) minmax(0, 1fr);
+  width: min(100%, 1100px);
+  min-height: 620px;
+  height: min(760px, 100vh);
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--color-window);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 12%);
+}
+
+.title-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 12px;
+  background: var(--color-window);
+  font-size: 12px;
+}
+
+.title-bar__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-bar__app-icon {
+  font-size: 15px;
+}
+
+.window-controls {
+  display: flex;
+  align-self: stretch;
+}
+
+.window-controls__button {
+  display: grid;
+  width: 44px;
+  place-items: center;
+  font-size: 15px;
+}
+
+.window-controls__button--close:hover {
+  color: #fff;
+  background: var(--color-close);
+}
+
+.calculator-main {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: 54px minmax(150px, 1fr) 42px minmax(300px, 1.45fr);
+  padding: 0 8px 8px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.toolbar__menu {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  border-radius: 3px;
+}
+
+.toolbar__menu span {
+  width: 17px;
+  height: 1px;
+  background: currentColor;
+}
+
+.toolbar__mode {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.toolbar__pin {
+  margin-left: auto;
+  padding: 8px;
+  color: var(--color-muted);
+  font-size: 19px;
+}
+
+.display {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 12px 12px 18px;
+  overflow: hidden;
+}
+
+.display__expression {
+  min-height: 20px;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.display__value {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: clamp(42px, 6vw, 54px);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memory-keys {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: center;
+  gap: 3px;
+}
+
+.memory-key {
+  min-width: 0;
+  height: 34px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.memory-key:hover:not(:disabled) {
+  background: var(--color-hover);
+}
+
+.memory-key:disabled {
+  color: #999;
+}
+
+.keypad {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: var(--key-gap);
+}
+
+.key {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 1px;
+  background: var(--color-function);
+  color: var(--color-text);
+  font-size: 19px;
+  cursor: default;
+}
+
+.key--number {
+  background: var(--color-key);
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.key--operator {
+  background: var(--color-function);
+  font-size: 22px;
+}
+
+.key--function {
+  font-size: 17px;
+}
+
+.key--equals {
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 25px;
+}
+
+.key--equals:hover {
+  background: #176fcf;
+}
+
+.key:not(.key--equals):hover {
+  background: var(--color-hover);
+}
+
+.keypad__spacer {
+  display: block;
+}
+
+.history-panel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 18px 14px;
+  border-left: 1px solid #d0d0d0;
+}
+
+.history-panel__tabs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.history-panel__tab {
+  margin: 0;
+  padding: 0 2px 10px;
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.history-panel__tab--active {
+  border-bottom: 3px solid var(--color-accent);
+  color: var(--color-text);
+}
+
+.history-panel__empty {
+  margin: 20px 4px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -3px;
+}
+
+@media (max-width: 760px) {
+  .calculator-window {
+    grid-template-columns: minmax(0, 1fr) 210px;
+  }
+
+  .calculator-main {
+    grid-template-rows: 50px minmax(130px, 1fr) 38px minmax(280px, 1.4fr);
+  }
+
+  .key--desktop-only,
+  .keypad__spacer {
+    display: none;
+  }
+
+  .keypad {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+  }
+
+  .key--sign {
+    grid-column: 1;
+    grid-row: 6;
+  }
+
+  .key--number:nth-of-type(17) {
+    grid-column: 2;
+    grid-row: 6;
+  }
+
+  .key--number:nth-of-type(18) {
+    grid-column: 3;
+    grid-row: 6;
+  }
+
+  .key--equals {
+    grid-column: 4;
+    grid-row: 6;
+  }
+}
+
+@media (max-width: 560px) {
+  body {
+    background: var(--color-window);
+  }
+
+  .calculator-window {
+    width: 100%;
+    height: 100vh;
+    min-height: 540px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .history-panel {
+    display: none;
+  }
+
+  .calculator-main {
+    padding-inline: 5px;
+    grid-template-rows: 48px minmax(145px, 1fr) 38px minmax(300px, 1.5fr);
+  }
+
+  .display {
+    padding-right: 10px;
+  }
+
+  .key {
+    font-size: 17px;
+  }
+
+  .key--number {
+    font-size: 23px;
+  }
+}
+
+@media (max-height: 620px) and (min-width: 561px) {
+  .calculator-window {
+    min-height: 0;
+    height: 100vh;
+  }
+
+  .calculator-main {
+    grid-template-rows: 42px minmax(90px, 1fr) 34px minmax(220px, 1.5fr);
+  }
+
+  .display__value {
+    font-size: 40px;
+  }
+}
