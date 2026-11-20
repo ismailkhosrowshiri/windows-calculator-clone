@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A static Windows 10-style calculator interface built with semantic HTML and CSS.">
+  <title>Windows Calculator UI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="calculator-window" aria-label="Windows-style calculator interface">
+    <header class="title-bar">
+      <div class="title-bar__title">
+        <span class="title-bar__app-icon" aria-hidden="true">▦</span>
+        <span>Calculator</span>
+      </div>
+      <div class="window-controls" aria-hidden="true">
+        <span class="window-controls__button">−</span>
+        <span class="window-controls__button">□</span>
+        <span class="window-controls__button window-controls__button--close">×</span>
+      </div>
+    </header>
+
+    <section class="calculator-main" aria-label="Calculator">
+      <div class="toolbar">
+        <div class="toolbar__menu" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <h1 class="toolbar__mode">Standard</h1>
+        <span class="toolbar__pin" aria-hidden="true">⌖</span>
+      </div>
+
+      <section class="display" aria-label="Calculator display">
+        <p class="display__expression" aria-hidden="true"></p>
+        <output class="display__value" aria-label="Displayed value">0</output>
+      </section>
+
+      <section class="memory-keys" aria-label="Memory keys">
+        <button class="memory-key" type="button" disabled>MC</button>
+        <button class="memory-key" type="button" disabled>MR</button>
+        <button class="memory-key" type="button">M+</button>
+        <button class="memory-key" type="button">M−</button>
+        <button class="memory-key" type="button">MS</button>
+        <button class="memory-key memory-key--list" type="button">M⌄</button>
+      </section>
+
+      <section class="keypad" aria-label="Calculator keypad">
+        <button class="key key--function" type="button">%</button>
+        <button class="key key--function" type="button">CE</button>
+        <button class="key key--function" type="button">C</button>
+        <button class="key key--function" type="button" aria-label="Backspace">⌫</button>
+        <button class="key key--function key--desktop-only" type="button">⅟ₓ</button>
+
+        <button class="key key--function" type="button">⅟ₓ</button>
+        <button class="key key--function" type="button">x²</button>
+        <button class="key key--function" type="button">√x</button>
+        <button class="key key--operator" type="button">÷</button>
+        <button class="key key--function key--desktop-only" type="button">±</button>
+
+        <button class="key key--number" type="button">7</button>
+        <button class="key key--number" type="button">8</button>
+        <button class="key key--number" type="button">9</button>
+        <button class="key key--operator" type="button">×</button>
+        <button class="key key--function key--desktop-only" type="button">±</button>
+
+        <button class="key key--number" type="button">4</button>
+        <button class="key key--number" type="button">5</button>
+        <button class="key key--number" type="button">6</button>
+        <button class="key key--operator" type="button">−</button>
+        <button class="key key--function key--desktop-only" type="button">.</button>
+
+        <button class="key key--number" type="button">1</button>
+        <button class="key key--number" type="button">2</button>
+        <button class="key key--number" type="button">3</button>
+        <button class="key key--operator" type="button">+</button>
+        <button class="key key--function key--desktop-only" type="button">0</button>
+
+        <button class="key key--function key--sign" type="button">±</button>
+        <button class="key key--number" type="button">0</button>
+        <button class="key key--number" type="button">.</button>
+        <button class="key key--equals" type="button">=</button>
+        <span class="keypad__spacer" aria-hidden="true"></span>
+      </section>
+    </section>
+
+    <aside class="history-panel" aria-label="History panel">
+      <div class="history-panel__tabs">
+        <h2 class="history-panel__tab history-panel__tab--active">History</h2>
+        <h2 class="history-panel__tab">Memory</h2>
+      </div>
+      <p class="history-panel__empty">There's no history yet</p>
+    </aside>
+  </main>
+</body>
+</html>
